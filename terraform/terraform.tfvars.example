@@ -1,0 +1,12 @@
+# Example tfvars — copy to terraform.tfvars and fill in values
+subscription_id      = "your-subscription-id"
+principal_id         = "your-object-id"
+fabric_admin_members = ["your-email@domain.com"]
+
+# Optional overrides
+# location                  = "eastus2"
+# search_location           = "eastus"
+# openai_model_name         = "gpt-5.4"
+# openai_capacity           = 10
+# fabric_sku                = "F4"
+# enable_private_networking = false

@@ -1,0 +1,14 @@
+# Azure
+.azure/
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+infra/main.json

@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: dt-agent-poc-accelerator
+metadata:
+  template: dt-agent-poc-accelerator@1.0.0
+
+hooks:
+  postprovision:
+    windows:
+      shell: pwsh
+      continueOnError: true
+      interactive: true
+      run: echo "Provisioning complete. Configure agent tools via azd env set."
+    posix:
+      shell: sh
+      continueOnError: true
+      interactive: true
+      run: echo "Provisioning complete. Configure agent tools via azd env set."

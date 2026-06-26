@@ -216,7 +216,20 @@ graph LR
     style PublicAccess fill:#ffebee,stroke:#c62828
 ```
 
-Enable with:
+#### What Private Networking Does
+
+| # | What | Why |
+|---|------|-----|
+| 1 | Creates a **VNet** (`dt-agent-vnet`, 10.0.0.0/16) with a dedicated subnet (10.0.1.0/24) | Provides an isolated network boundary for Azure PaaS services |
+| 2 | Deploys **private endpoints** for AI Foundry and AI Search | Assigns private IPs inside the VNet — all traffic stays on the Microsoft backbone, never traverses the public internet |
+| 3 | **Disables public network access** on both AI Foundry and AI Search | Makes the services completely unreachable from the internet |
+| 4 | Creates **3 private DNS zones** linked to the VNet | Ensures DNS resolution routes to the private IPs (`privatelink.cognitiveservices.azure.com`, `privatelink.openai.azure.com`, `privatelink.search.windows.net`) |
+
+**Practical effect:** Only resources inside (or peered to) the VNet can reach the AI services. This is ideal for production and compliance scenarios where endpoints must not be publicly exposed.
+
+> 💡 **For PoC/demo use**, leave private networking **disabled** so you can access the services from your laptop and the Foundry portal without requiring a VPN or ExpressRoute connection.
+
+#### Enable Private Networking
 
 ```bash
 # Bicep

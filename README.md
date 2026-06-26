@@ -13,7 +13,7 @@ Deploy with **Bicep** (via Azure Developer CLI) or **Terraform** — both produc
 | **GPT-5.4** model deployment | GlobalStandard, 10K TPM | LLM powering the agent |
 | **Azure AI Search** | Basic, semantic enabled | Knowledge base for operational playbooks |
 | **AI Search connection** | AAD auth | Auto-wired to the Foundry project |
-| **Microsoft Fabric** capacity | F4 (configurable) | Semantic layer, Direct Lake, Power BI |
+| **Microsoft Fabric** capacity | F4 (configurable) | Semantic layer for store KPIs |
 | **VNet + Private Endpoints** *(optional)* | — | Network isolation for AI Services & Search |
 
 ### RBAC (auto-provisioned)
@@ -156,8 +156,6 @@ graph LR
 
         subgraph Fabric["Microsoft Fabric Capacity<br/>(F4 · 4 CUs)"]
             Lakehouse["Lakehouse /<br/>Warehouse"]
-            SemanticModel["Semantic Model<br/>(Direct Lake)"]
-            Lakehouse --> SemanticModel
         end
 
         Connection["ai-search-connection<br/>(AAD auth)"]
@@ -175,28 +173,13 @@ graph LR
         AccountMSI -->|"Search Index Data Reader"| Search
     end
 
-    subgraph External["External Data Sources (post-deploy)"]
-        MCP_Weather["Weather MCP<br/>(Azure Function)"]
-        MCP_Traffic["Traffic MCP<br/>(Azure Function)"]
-        MCP_Genie["Databricks Genie MCP<br/>(AWS)"]
-        WorkIQ["Work IQ<br/>(M365 Graph)"]
-        WebSearch["Bing Web Search"]
-    end
-
-    Agent -.->|"MCP tools"| MCP_Weather
-    Agent -.->|"MCP tools"| MCP_Traffic
-    Agent -.->|"MCP tools"| MCP_Genie
-    Agent -.->|"M365 grounding"| WorkIQ
-    Agent -.->|"Bing grounding"| WebSearch
     Agent -->|"AI Search tool"| Index
-    SemanticModel -.->|"future: Fabric Data Agent"| Agent
 
     style RG fill:#f0f4ff,stroke:#4a6cf7
     style Foundry fill:#e8f0fe,stroke:#1a73e8
     style Search fill:#e8f5e9,stroke:#34a853
     style Fabric fill:#fff3e0,stroke:#f9a825
     style RBAC fill:#fce4ec,stroke:#e91e63
-    style External fill:#f3e5f5,stroke:#9c27b0
 ```
 
 ### Private Networking Overlay
@@ -246,12 +229,10 @@ terraform apply
 
 ## Post-Deployment
 
-After infrastructure is provisioned, configure the agent's tools:
+After infrastructure is provisioned:
 
 1. **AI Search tool** — auto-wired via the `ai-search-connection` (no action needed)
-2. **MCP tools** (Weather, Traffic, Databricks Genie) — deploy as Azure Functions, register as MCP connections on the project
-3. **Work IQ** — add M365 grounding via the Foundry portal
-4. **Web Search** — enable Bing grounding in the project
+2. **Upload playbooks** — index operational playbooks into AI Search for RAG grounding
 
 ## Cost Estimate (Monthly)
 

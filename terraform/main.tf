@@ -35,6 +35,7 @@ resource "azurerm_cognitive_account" "foundry" {
   custom_subdomain_name         = "dt-agent-ai-${random_string.suffix.result}"
   public_network_access_enabled = !var.enable_private_networking
   local_auth_enabled            = true
+  project_management_enabled    = true
   tags                          = var.tags
 
   identity {

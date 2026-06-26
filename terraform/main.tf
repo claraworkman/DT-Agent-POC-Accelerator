@@ -61,7 +61,7 @@ resource "azapi_resource" "foundry_project" {
   body = {
     properties = {
       displayName = "Discount Tire Store Performance Advisor"
-      description = "Foundry project hosting the Store Performance Advisor agent with AI Search, MCP tools, and Fabric data."
+      description = "Foundry project hosting the Store Performance Advisor agent with AI Search and Fabric data."
     }
   }
 }

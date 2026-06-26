@@ -4,7 +4,7 @@
 // Provisions:
 //   * Azure AI Foundry account (CognitiveServices kind=AIServices)
 //   * Azure AI Foundry project (child of the account)
-//   * GPT-4.1 model deployment (Azure OpenAI via Foundry model catalog)
+//   * GPT-5.4 model deployment (Azure OpenAI via Foundry model catalog)
 //   * Azure AI Search (backs the Foundry IQ knowledge base)
 //   * Microsoft Fabric capacity (F4 SKU)
 //   * Role assignments granting the deploying principal data-plane access
@@ -116,12 +116,12 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-0
   }
   properties: {
     displayName: 'Discount Tire Store Performance Advisor'
-    description: 'Foundry project hosting the Store Performance Advisor agent with AI Search, MCP tools, and Fabric data.'
+    description: 'Foundry project hosting the Store Performance Advisor agent with AI Search and Fabric data.'
   }
 }
 
 // ---------------------------------------------------------------------------
-// GPT-4.1 model deployment
+// GPT-5.4 model deployment
 // ---------------------------------------------------------------------------
 
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {

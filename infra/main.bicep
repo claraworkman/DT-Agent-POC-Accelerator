@@ -6,7 +6,7 @@
 // Resources provisioned:
 //   * Azure AI Foundry account (CognitiveServices kind=AIServices)
 //   * Azure AI Foundry project (child of the account)
-//   * GPT-4.1 model deployment (Azure OpenAI via Foundry model catalog)
+//   * GPT-5.4 model deployment (Azure OpenAI via Foundry model catalog)
 //   * Azure AI Search (backs the Foundry IQ knowledge base)
 //   * Microsoft Fabric capacity (F4 SKU)
 //

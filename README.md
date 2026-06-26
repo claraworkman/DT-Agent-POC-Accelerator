@@ -69,11 +69,14 @@ git clone https://github.com/claraworkman/DT-Agent-POC-Accelerator.git
 cd DT-Agent-POC-Accelerator
 azd init
 
-# 3. Configure
+# 3. Authenticate
+azd auth login
+
+# 4. Configure
 azd env set AZURE_LOCATION eastus2
 azd env set FABRIC_ADMIN_UPN your-email@domain.com
 
-# 4. Deploy
+# 5. Deploy
 azd up
 ```
 
@@ -103,11 +106,15 @@ azd down --purge
 git clone https://github.com/claraworkman/DT-Agent-POC-Accelerator.git
 cd DT-Agent-POC-Accelerator/terraform
 
-# 2. Copy and edit variables
+# 2. Authenticate
+az login
+az account set --subscription "your-subscription-id"
+
+# 3. Copy and edit variables
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars with your subscription_id, principal_id, and fabric_admin_members
 
-# 3. Deploy
+# 4. Deploy
 terraform init
 terraform plan
 terraform apply

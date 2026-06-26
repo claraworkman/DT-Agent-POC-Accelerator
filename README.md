@@ -141,7 +141,7 @@ terraform destroy
 ## Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph RG["Resource Group: DT-Agent-POC"]
         subgraph Foundry["Azure AI Foundry Account<br/>(CognitiveServices kind=AIServices, S0)"]
             Project["AI Foundry Project<br/>dt-agent-project"]
@@ -204,7 +204,7 @@ graph TB
 When `enable_private_networking = true`, the following resources wrap the core infrastructure:
 
 ```mermaid
-graph TB
+graph LR
     subgraph VNet["VNet: dt-agent-vnet (10.0.0.0/16)"]
         subgraph Subnet["Subnet: private-endpoints (10.0.1.0/24)"]
             PE_AI["PE: pe-dt-agent-ai<br/>→ AI Foundry (account)"]

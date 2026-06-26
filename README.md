@@ -140,31 +140,100 @@ terraform destroy
 
 ## Architecture
 
+```mermaid
+graph TB
+    subgraph RG["Resource Group: DT-Agent-POC"]
+        subgraph Foundry["Azure AI Foundry Account<br/>(CognitiveServices kind=AIServices, S0)"]
+            Project["AI Foundry Project<br/>dt-agent-project"]
+            GPT["GPT-5.4 Deployment<br/>GlobalStandard · 10K TPM"]
+            Project -->|"hosts"| Agent["Store Performance<br/>Advisor Agent"]
+            Agent -->|"inference"| GPT
+        end
+
+        subgraph Search["Azure AI Search<br/>(Basic · semantic enabled)"]
+            Index["store-playbooks index"]
+        end
+
+        subgraph Fabric["Microsoft Fabric Capacity<br/>(F4 · 4 CUs)"]
+            Lakehouse["Lakehouse /<br/>Warehouse"]
+            SemanticModel["Semantic Model<br/>(Direct Lake)"]
+            Lakehouse --> SemanticModel
+        end
+
+        Connection["ai-search-connection<br/>(AAD auth)"]
+        Project --- Connection
+        Connection -->|"query"| Search
+    end
+
+    subgraph RBAC["RBAC Assignments"]
+        User["Deploying Principal"]
+        ProjectMSI["Project MSI"]
+        AccountMSI["Account MSI"]
+        User -->|"Cognitive Services Contributor<br/>+ OpenAI User"| Foundry
+        User -->|"Search Service Contributor<br/>+ Index Data Contributor<br/>+ Index Data Reader"| Search
+        ProjectMSI -->|"Search Index Data Reader"| Search
+        AccountMSI -->|"Search Index Data Reader"| Search
+    end
+
+    subgraph External["External Data Sources (post-deploy)"]
+        MCP_Weather["Weather MCP<br/>(Azure Function)"]
+        MCP_Traffic["Traffic MCP<br/>(Azure Function)"]
+        MCP_Genie["Databricks Genie MCP<br/>(AWS)"]
+        WorkIQ["Work IQ<br/>(M365 Graph)"]
+        WebSearch["Bing Web Search"]
+    end
+
+    Agent -.->|"MCP tools"| MCP_Weather
+    Agent -.->|"MCP tools"| MCP_Traffic
+    Agent -.->|"MCP tools"| MCP_Genie
+    Agent -.->|"M365 grounding"| WorkIQ
+    Agent -.->|"Bing grounding"| WebSearch
+    Agent -->|"AI Search tool"| Index
+    SemanticModel -.->|"future: Fabric Data Agent"| Agent
+
+    style RG fill:#f0f4ff,stroke:#4a6cf7
+    style Foundry fill:#e8f0fe,stroke:#1a73e8
+    style Search fill:#e8f5e9,stroke:#34a853
+    style Fabric fill:#fff3e0,stroke:#f9a825
+    style RBAC fill:#fce4ec,stroke:#e91e63
+    style External fill:#f3e5f5,stroke:#9c27b0
 ```
-┌──────────────────────────────────────────────────────┐
-│  Resource Group: DT-Agent-POC                        │
-│                                                      │
-│  ┌─────────────────────┐  ┌───────────────────────┐ │
-│  │  AI Foundry Account │  │  Azure AI Search      │ │
-│  │  └─ Project         │  │  (playbooks index)    │ │
-│  │     └─ Agent        │  └───────────────────────┘ │
-│  │     └─ GPT-5.4      │                            │
-│  └─────────────────────┘  ┌───────────────────────┐ │
-│                            │  Fabric Capacity (F4) │ │
-│                            │  (semantic layer)     │ │
-│                            └───────────────────────┘ │
-└──────────────────────────────────────────────────────┘
+
+### Private Networking Overlay
+
+When `enable_private_networking = true`, the following resources wrap the core infrastructure:
+
+```mermaid
+graph TB
+    subgraph VNet["VNet: dt-agent-vnet (10.0.0.0/16)"]
+        subgraph Subnet["Subnet: private-endpoints (10.0.1.0/24)"]
+            PE_AI["PE: pe-dt-agent-ai<br/>→ AI Foundry (account)"]
+            PE_Search["PE: pe-dt-agent-search<br/>→ AI Search (searchService)"]
+        end
+    end
+
+    subgraph DNS["Private DNS Zones (global)"]
+        DNS1["privatelink.cognitiveservices.azure.com"]
+        DNS2["privatelink.openai.azure.com"]
+        DNS3["privatelink.search.windows.net"]
+    end
+
+    PE_AI --- DNS1
+    PE_AI --- DNS2
+    PE_Search --- DNS3
+    DNS1 ---|"VNet link"| VNet
+    DNS2 ---|"VNet link"| VNet
+    DNS3 ---|"VNet link"| VNet
+
+    PublicAccess["Public Network Access:<br/>❌ DISABLED on AI Foundry<br/>❌ DISABLED on AI Search"]
+
+    style VNet fill:#e3f2fd,stroke:#1565c0
+    style Subnet fill:#bbdefb,stroke:#1565c0
+    style DNS fill:#fff8e1,stroke:#f9a825
+    style PublicAccess fill:#ffebee,stroke:#c62828
 ```
 
-## Private Networking (Optional)
-
-When `enable_private_networking = true`:
-
-- VNet (`10.0.0.0/16`) with a private endpoint subnet (`10.0.1.0/24`)
-- Private endpoints for AI Foundry (`account` group) and AI Search (`searchService` group)
-- 3 Private DNS zones: `privatelink.cognitiveservices.azure.com`, `privatelink.openai.azure.com`, `privatelink.search.windows.net`
-- VNet links for DNS resolution
-- Public access **disabled** on both AI Foundry and AI Search
+Enable with:
 
 ```bash
 # Bicep

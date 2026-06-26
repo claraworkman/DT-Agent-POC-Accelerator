@@ -162,7 +162,7 @@ graph LR
         end
 
         subgraph Fabric["Microsoft Fabric Capacity<br/>(F4 · 4 CUs)"]
-            Lakehouse["Lakehouse /<br/>Warehouse"]
+            SemanticModel["Semantic Model"]
         end
 
         Connection["ai-search-connection<br/>(AAD auth)"]
